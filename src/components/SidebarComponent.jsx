@@ -6,7 +6,7 @@ import { getAvatarColor } from '../utils/getAvatarColor';
 
 function SidebarComponent({ customers, onSelectCustomer, selectedCustomer }) {
     return (
-        <div className="w-1/4 bg-white border-r border-gray-200 p-4">
+        <div className="w-1/4 bg-white border-b-2 border-gray-200 p-4">
             <h2 className="text-lg font-semibold mb-4">Your inbox</h2>
             <ul>
                 {customers.map((msg, i) => {
