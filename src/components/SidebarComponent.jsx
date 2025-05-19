@@ -2,6 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
+import { getAvatarColor } from '../utils/getAvatarColor';
 
 function SidebarComponent({ customers, onSelectCustomer, selectedCustomer }) {
     return (
@@ -24,16 +25,18 @@ function SidebarComponent({ customers, onSelectCustomer, selectedCustomer }) {
                         >
                             {/* Avatar with status */}
                             <div className="relative">
-                                <div className="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center font-semibold text-indigo-700">
+                                <div
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${getAvatarColor(msg.name)}`}
+                                >
                                     {msg.name?.charAt(0) || 'U'}
                                 </div>
                                 {msg.status && (
                                     <span
                                         className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${msg.status === 'urgent'
-                                                ? 'bg-red-500'
-                                                : msg.status === 'waiting'
-                                                    ? 'bg-yellow-400'
-                                                    : 'bg-green-500'
+                                            ? 'bg-red-500'
+                                            : msg.status === 'waiting'
+                                                ? 'bg-yellow-400'
+                                                : 'bg-green-500'
                                             }`}
                                     ></span>
                                 )}
