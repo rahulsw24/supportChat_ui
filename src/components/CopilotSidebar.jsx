@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FiSend } from "react-icons/fi";
 import { BiCopy } from "react-icons/bi";
 
-const CopilotSidebar = ({ customer }) => {
+const CopilotSidebar = ({ customer, setComposerText }) => {
     const [aiReply, setAiReply] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -11,7 +10,6 @@ const CopilotSidebar = ({ customer }) => {
         if (!customer || customer.messages.length === 0) return;
 
         const latestMsg = [...customer.messages].reverse().find(msg => msg.from !== 'agent');
-
         if (!latestMsg) return;
 
         const fetchReply = async () => {
@@ -30,6 +28,10 @@ const CopilotSidebar = ({ customer }) => {
 
         fetchReply();
     }, [customer]);
+
+    const handleAddToComposer = () => {
+        setComposerText(aiReply); // ✅ sends reply to ChatWindow input
+    };
 
     return (
         <div className="flex flex-col h-full w-1/3 bg-gradient-to-b from-[#ffffff] via-[#fdf9fc] to-[#fef3f3]">
@@ -50,25 +52,22 @@ const CopilotSidebar = ({ customer }) => {
                     <span className="text-2xl font-bold">🤖</span>
                 </div>
                 <h2 className="text-lg font-semibold mb-1">Hi, I’m Fin AI Copilot</h2>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-gray-500 mb-4">
                     Here's a suggested reply based on the conversation.
                 </p>
 
-                <div className="bg-gray-100 text-sm text-gray-800 px-4 py-2 rounded-md max-w-xs w-full">
+                <div className="bg-gray-100 text-sm text-gray-800 px-4 py-2 rounded-md max-w-xs w-full mb-2">
                     {loading ? "Thinking..." : aiReply}
                 </div>
-            </div>
 
-            {/* Input Box */}
-            <div className="border-t p-3 flex items-center space-x-2">
-                <input
-                    type="text"
-                    placeholder="Ask a question..."
-                    className="w-full border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
-                />
-                <button>
-                    <FiSend className="text-gray-500 hover:text-purple-600" size={20} />
-                </button>
+                {!loading && aiReply && (
+                    <button
+                        onClick={handleAddToComposer}
+                        className="text-sm text-purple-600 hover:underline mt-1"
+                    >
+                        📋 Add to composer
+                    </button>
+                )}
             </div>
         </div>
     );

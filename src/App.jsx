@@ -6,6 +6,7 @@ import { customers } from './data/customers'; //
 
 function App() {
   const [selectedCustomer, setSelectedCustomer] = useState(customers[0]); // Default to first
+  const [composerText, setComposerText] = useState("");
 
   return (
     <div className='flex h-screen bg-[#ede9fe]'>
@@ -14,8 +15,9 @@ function App() {
         onSelectCustomer={setSelectedCustomer}
         selectedCustomer={selectedCustomer}
       />
-      <ChatWindow customer={selectedCustomer} />
-      <CopilotSidebar customer={selectedCustomer} />
+      <ChatWindow customer={selectedCustomer} composerText={composerText}
+        setComposerText={setComposerText} />
+      <CopilotSidebar customer={selectedCustomer} setComposerText={setComposerText} />
     </div>
   );
 }

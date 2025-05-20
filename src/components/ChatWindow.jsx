@@ -2,7 +2,7 @@ import React from 'react';
 import { getAvatarColor } from '../utils/getAvatarColor';
 
 
-function ChatWindow({ customer }) {
+function ChatWindow({ customer, composerText, setComposerText }) {
     if (!customer) {
         return <div className="w-2/4 bg-white p-6">No customer selected.</div>;
     }
@@ -58,6 +58,8 @@ function ChatWindow({ customer }) {
                     <input
                         type="text"
                         placeholder="Type a message..."
+                        value={composerText}
+                        onChange={(e) => setComposerText(e.target.value)}
                         className="flex-1 outline-none"
                     />
                     <button className="text-blue-600 font-medium">Send</button>
