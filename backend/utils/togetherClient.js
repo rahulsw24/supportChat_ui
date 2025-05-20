@@ -9,10 +9,15 @@ const getTogetherAiResponse = async (message) => {
     const response = await together.chat.completions.create({
       model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
       messages: [
-        { role: "system", content: "You are a helpful travel guide." },
+        {
+          role: "system",
+          content:
+            "You are a helpful, empathetic, and professional customer support agent for a fictional company called NovaTech. Your job is to assist users with common queries, such as orders, refunds, product issues, and account-related problems. Always be clear, friendly, and solution-focused.",
+        },
         { role: "user", content: message },
       ],
     });
+
     return response.choices[0].message.content;
   } catch (error) {
     console.error("Error fetching response from Together.AI:", error);
@@ -21,13 +26,3 @@ const getTogetherAiResponse = async (message) => {
 };
 
 export default getTogetherAiResponse;
-
-// const response = await together.chat.completions.create({
-//   model: "meta-llama/Llama-3-8b-chat-hf",
-//   messages: [
-//     { role: "system", content: "You are a helpful travel guide." },
-//     { role: "user", content: "What are some fun things to do in New York?" },
-//   ],
-// });
-
-// console.log(response.choices[0].message.content);
