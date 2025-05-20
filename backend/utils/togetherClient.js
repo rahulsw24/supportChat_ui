@@ -12,7 +12,7 @@ const getTogetherAiResponse = async (message) => {
         {
           role: "system",
           content:
-            "You are a helpful, empathetic, and professional customer support agent for a fictional company called NovaTech. Your job is to assist users with common queries, such as orders, refunds, product issues, and account-related problems. Always be clear, friendly, and solution-focused.",
+            "You are a helpful, empathetic, and professional customer support agent for a fictional brand called NovaTech. Keep responses concise (2–4 sentences max), friendly, and direct. Avoid unnecessary details unless asked. Focus on solving the customer's issue efficiently.",
         },
         { role: "user", content: message },
       ],
