@@ -9,14 +9,12 @@ const CopilotSidebar = ({ customer, setComposerText }) => {
     const [loading, setLoading] = useState(false);
     const chatRef = useRef(null);
 
-    // Auto scroll to bottom
     useEffect(() => {
         if (chatRef.current) {
             chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
     }, [chatHistory, loading]);
 
-    // Initial AI response on customer selection
     useEffect(() => {
         if (!customer || !customer.messages.length) return;
 
@@ -31,13 +29,9 @@ const CopilotSidebar = ({ customer, setComposerText }) => {
                 });
                 const aiReply = res.data.reply;
 
-                setChatHistory([
-                    { role: "ai", text: aiReply },
-                ]);
+                setChatHistory([{ role: "ai", text: aiReply }]);
             } catch (err) {
-                setChatHistory([
-                    { role: "ai", text: "Could not generate a reply." },
-                ]);
+                setChatHistory([{ role: "ai", text: "Could not generate a reply." }]);
             } finally {
                 setLoading(false);
             }
@@ -68,17 +62,14 @@ const CopilotSidebar = ({ customer, setComposerText }) => {
         }
     };
 
-    const handleAddToComposer = () => {
-        const lastAiMsg = [...chatHistory].reverse().find(msg => msg.role === "ai");
-        if (lastAiMsg) {
-            setComposerText(lastAiMsg.text);
-        }
+    const handleAddToComposer = (text) => {
+        setComposerText(text);
     };
 
     return (
         <div className="flex flex-col h-full w-1/3 bg-gradient-to-b from-[#ffffff] via-[#fdf9fc] to-[#fef3f3]">
             {/* Tabs */}
-            <div className="flex justify-between items-center p-3 border-b">
+            <div className="flex justify-between items-center p-3 border-gray-200 border-b">
                 <div className="flex space-x-4">
                     <button className="border-b-2 border-purple-500 text-purple-600 font-semibold pb-1">
                         AI Copilot
@@ -91,31 +82,35 @@ const CopilotSidebar = ({ customer, setComposerText }) => {
             {/* Chat Section */}
             <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-4">
                 {chatHistory.map((msg, i) => (
-                    <div key={i} className={`flex items-start ${msg.role === "ai" ? "justify-start" : "justify-end"}`}>
-                        {msg.role === "ai" && (
-                            <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center mr-2 font-bold">🤖</div>
+                    <div key={i} className={`flex ${msg.role === "ai" ? "justify-start" : "justify-end"}`}>
+                        {msg.role === "ai" ? (
+                            <div className="flex flex-col max-w-[80%] bg-gradient-to-br from-[#f2e9fb] to-[#f8f2ff] p-4 rounded-2xl shadow-md text-sm text-gray-800 space-y-2">
+                                <div className="flex items-start space-x-2">
+                                    <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold">
+                                        🤖
+                                    </div>
+                                    <div className="whitespace-pre-wrap">{msg.text}</div>
+                                </div>
+                                <div className="w-full">
+                                    <button
+                                        onClick={() => handleAddToComposer(msg.text)}
+                                        className="w-full text-xs px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 transition"
+                                    >
+                                        ✍️ Add to composer
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="max-w-xs bg-[#e5e7fb] text-right rounded-lg px-4 py-2 text-sm">
+                                {msg.text}
+                            </div>
                         )}
-                        <div className={`rounded-lg px-4 py-2 max-w-xs ${msg.role === "ai" ? "bg-gray-100 text-left" : "bg-[#e5e7fb] text-right"}`}>
-                            {msg.text}
-                        </div>
                     </div>
                 ))}
                 {loading && (
                     <div className="text-sm text-gray-400 text-center">Thinking...</div>
                 )}
             </div>
-
-            {/* Add to Composer */}
-            {chatHistory.some(m => m.role === "ai") && (
-                <div className="text-center pb-2">
-                    <button
-                        onClick={handleAddToComposer}
-                        className="text-sm text-purple-600 hover:underline"
-                    >
-                        📋 Add last suggestion to composer
-                    </button>
-                </div>
-            )}
 
             {/* Input */}
             <div className="border-t p-3 flex items-center space-x-2">

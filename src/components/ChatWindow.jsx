@@ -53,18 +53,29 @@ function ChatWindow({ customer, composerText, setComposerText }) {
             </div>
 
             {/* Chat input */}
-            <div className="border-t px-4 py-3 bg-white">
-                <div className="flex items-center gap-2 border rounded-md px-3 py-2 shadow-sm">
-                    <input
-                        type="text"
-                        placeholder="Type a message..."
+            <div className="px-4 py-3 bg-white">
+                <div className="flex flex-row items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 shadow-sm bg-white w-full min-h-[64px]">
+                    {/* Left icons */}
+                    {/* <div className="flex items-center gap-3 text-gray-500">
+                        <button title="Quick actions">⚡</button>
+                        <button title="Upload">📎</button>
+                        <button title="Emoji">😊</button>
+                    </div> */}
+
+                    {/* Bigger input field */}
+                    <textarea
+                        placeholder="Use ⌘K for shortcuts"
                         value={composerText}
                         onChange={(e) => setComposerText(e.target.value)}
-                        className="flex-1 outline-none"
+                        rows={5}
+                        className="flex-1 bg-transparent outline-none px-3 text-base resize-none placeholder-gray-400"
                     />
-                    <button className="text-blue-600 font-medium">Send</button>
+
+                    {/* Send button */}
+                    <button className="text-gray-600 hover:text-black font-medium text-sm">Send</button>
                 </div>
             </div>
+
         </div>
     );
 }
