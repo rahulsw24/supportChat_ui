@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import { BiCopy } from "react-icons/bi"; // top right icon
 
-const CopilotSidebar = () => {
+const CopilotSidebar = ({ customer }) => {
+    const [aiReply, setAiReply] = useState("");
+
     return (
         <div className="flex flex-col h-full w-1/3 bg-gradient-to-b from-[#ffffff] via-[#fdf9fc] to-[#fef3f3]">
 

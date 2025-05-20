@@ -15,7 +15,7 @@ function App() {
         selectedCustomer={selectedCustomer}
       />
       <ChatWindow customer={selectedCustomer} />
-      <CopilotSidebar />
+      <CopilotSidebar customer={selectedCustomer} />
     </div>
   );
 }
