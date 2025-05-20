@@ -1,42 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { FiSend } from "react-icons/fi";
 import { BiCopy } from "react-icons/bi";
 
 const CopilotSidebar = ({ customer, setComposerText }) => {
-    const [aiReply, setAiReply] = useState("");
+    const [chatHistory, setChatHistory] = useState([]); // { role: "user" | "ai", text: string }
+    const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const chatRef = useRef(null);
 
+    // Auto scroll to bottom
     useEffect(() => {
-        if (!customer || customer.messages.length === 0) return;
+        if (chatRef.current) {
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }
+    }, [chatHistory, loading]);
 
-        const latestMsg = [...customer.messages].reverse().find(msg => msg.from !== 'agent');
+    // Initial AI response on customer selection
+    useEffect(() => {
+        if (!customer || !customer.messages.length) return;
+
+        const latestMsg = [...customer.messages].reverse().find(msg => msg.from !== "agent");
         if (!latestMsg) return;
 
-        const fetchReply = async () => {
+        const fetchInitialReply = async () => {
             setLoading(true);
             try {
                 const res = await axios.post("http://localhost:3000/api/generate-reply", {
                     message: latestMsg.text,
                 });
-                setAiReply(res.data.reply);
+                const aiReply = res.data.reply;
+
+                setChatHistory([
+                    { role: "ai", text: aiReply },
+                ]);
             } catch (err) {
-                setAiReply("Could not generate a reply.");
+                setChatHistory([
+                    { role: "ai", text: "Could not generate a reply." },
+                ]);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchReply();
+        fetchInitialReply();
     }, [customer]);
 
+    const handleSend = async () => {
+        if (!input.trim()) return;
+
+        const newHistory = [...chatHistory, { role: "user", text: input }];
+        setChatHistory(newHistory);
+        setInput("");
+        setLoading(true);
+
+        try {
+            const res = await axios.post("http://localhost:3000/api/generate-reply", {
+                message: input,
+            });
+
+            const aiReply = res.data.reply;
+            setChatHistory([...newHistory, { role: "ai", text: aiReply }]);
+        } catch {
+            setChatHistory([...newHistory, { role: "ai", text: "Sorry, I couldn't process that." }]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleAddToComposer = () => {
-        setComposerText(aiReply); // ✅ sends reply to ChatWindow input
+        const lastAiMsg = [...chatHistory].reverse().find(msg => msg.role === "ai");
+        if (lastAiMsg) {
+            setComposerText(lastAiMsg.text);
+        }
     };
 
     return (
         <div className="flex flex-col h-full w-1/3 bg-gradient-to-b from-[#ffffff] via-[#fdf9fc] to-[#fef3f3]">
-            {/* Top Tabs */}
-            <div className="flex justify-between items-center p-3 border-b-1 border-gray-200">
+            {/* Tabs */}
+            <div className="flex justify-between items-center p-3 border-b">
                 <div className="flex space-x-4">
                     <button className="border-b-2 border-purple-500 text-purple-600 font-semibold pb-1">
                         AI Copilot
@@ -46,28 +88,50 @@ const CopilotSidebar = ({ customer, setComposerText }) => {
                 <BiCopy className="text-gray-400 hover:text-black cursor-pointer" size={20} />
             </div>
 
-            {/* AI Response */}
-            <div className="flex flex-col items-center justify-center text-center px-4 py-12 flex-1">
-                <div className="bg-black text-white rounded-full p-3 mb-4">
-                    <span className="text-2xl font-bold">🤖</span>
-                </div>
-                <h2 className="text-lg font-semibold mb-1">Hi, I’m Fin AI Copilot</h2>
-                <p className="text-sm text-gray-500 mb-4">
-                    Here's a suggested reply based on the conversation.
-                </p>
+            {/* Chat Section */}
+            <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+                {chatHistory.map((msg, i) => (
+                    <div key={i} className={`flex items-start ${msg.role === "ai" ? "justify-start" : "justify-end"}`}>
+                        {msg.role === "ai" && (
+                            <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center mr-2 font-bold">🤖</div>
+                        )}
+                        <div className={`rounded-lg px-4 py-2 max-w-xs ${msg.role === "ai" ? "bg-gray-100 text-left" : "bg-[#e5e7fb] text-right"}`}>
+                            {msg.text}
+                        </div>
+                    </div>
+                ))}
+                {loading && (
+                    <div className="text-sm text-gray-400 text-center">Thinking...</div>
+                )}
+            </div>
 
-                <div className="bg-gray-100 text-sm text-gray-800 px-4 py-2 rounded-md max-w-xs w-full mb-2">
-                    {loading ? "Thinking..." : aiReply}
-                </div>
-
-                {!loading && aiReply && (
+            {/* Add to Composer */}
+            {chatHistory.some(m => m.role === "ai") && (
+                <div className="text-center pb-2">
                     <button
                         onClick={handleAddToComposer}
-                        className="text-sm text-purple-600 hover:underline mt-1"
+                        className="text-sm text-purple-600 hover:underline"
                     >
-                        📋 Add to composer
+                        📋 Add last suggestion to composer
                     </button>
-                )}
+                </div>
+            )}
+
+            {/* Input */}
+            <div className="border-t p-3 flex items-center space-x-2">
+                <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={
+                        chatHistory.length > 0 ? "Ask a follow-up question..." : "Ask me anything..."
+                    }
+                    className="w-full border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                />
+                <button onClick={handleSend}>
+                    <FiSend className="text-gray-500 hover:text-purple-600" size={20} />
+                </button>
             </div>
         </div>
     );
