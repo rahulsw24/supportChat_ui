@@ -8,6 +8,8 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const chatRef = useRef(null);
+    const [showIntro, setShowIntro] = useState(false);
+
 
     useEffect(() => {
         if (chatRef.current) {
@@ -21,6 +23,9 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
         const latestMsg = [...customer.messages].reverse().find(msg => msg.from !== "agent");
         if (!latestMsg) return;
 
+        setShowIntro(true); // show intro screen
+        setChatHistory([{ role: "intro", text: "👋 Hi, I’m Fin’s Copilot! Give me a moment while I read the conversation…" }]);
+
         const fetchInitialReply = async () => {
             setLoading(true);
             try {
@@ -33,10 +38,12 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
                 setChatHistory([{ role: "ai", text: "Could not generate a reply." }]);
             } finally {
                 setLoading(false);
+                setShowIntro(false);
             }
         };
 
-        fetchInitialReply();
+        // Optional delay for better UX
+        setTimeout(fetchInitialReply, 800);
     }, [customer]);
 
     const handleSend = async () => {
@@ -89,8 +96,8 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
             {/* Chat Section */}
             <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-4">
                 {chatHistory.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === "ai" ? "justify-start" : "justify-end"}`}>
-                        {msg.role === "ai" ? (
+                    <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                        {msg.role === "ai" || msg.role === "intro" ? (
                             <div className="flex flex-col max-w-[80%] bg-gradient-to-br from-[#f2e9fb] to-[#f8f2ff] p-4 rounded-2xl shadow-md text-sm text-gray-800 space-y-2">
                                 <div className="flex items-start space-x-2">
                                     <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold">
@@ -98,14 +105,16 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
                                     </div>
                                     <div className="whitespace-pre-wrap">{msg.text}</div>
                                 </div>
-                                <div className="w-full">
-                                    <button
-                                        onClick={() => handleAddToComposer(msg.text)}
-                                        className="w-full text-xs px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 transition"
-                                    >
-                                        ✍️ Add to composer
-                                    </button>
-                                </div>
+                                {msg.role === "ai" && (
+                                    <div className="w-full">
+                                        <button
+                                            onClick={() => handleAddToComposer(msg.text)}
+                                            className="w-full text-xs px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition font-bold"
+                                        >
+                                            ✍️ ADD TO COMPOSER
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="max-w-xs bg-[#e5e7fb] text-right rounded-lg px-4 py-2 text-sm">
@@ -114,6 +123,7 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
                         )}
                     </div>
                 ))}
+
                 {loading && (
                     <div className="text-sm text-gray-400 text-center">Thinking...</div>
                 )}
