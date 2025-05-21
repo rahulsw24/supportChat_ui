@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { getAvatarColor } from '../utils/getAvatarColor';
+import { FiSend } from "react-icons/fi";
+import { BiCopy } from "react-icons/bi";
+import { FiChevronDown } from "react-icons/fi";
+import { useEffect } from 'react';
 
 function ChatWindow({ customer, composerText, setComposerText }) {
+
+    const textareaRef = useRef(null);
+
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto'; // Reset height
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set to scrollHeight
+        }
+    }, [composerText]);
+
     if (!customer) {
         return <div className="flex-1 bg-white p-6">No customer selected.</div>;
     }
@@ -50,15 +64,31 @@ function ChatWindow({ customer, composerText, setComposerText }) {
 
             {/* Composer */}
             <div className="px-4 py-3 bg-white">
-                <div className="flex flex-row items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 shadow-sm bg-white w-full min-h-[64px]">
-                    <textarea
-                        placeholder="Use ⌘K for shortcuts"
-                        value={composerText}
-                        onChange={(e) => setComposerText(e.target.value)}
-                        rows={3}
-                        className="flex-1 bg-transparent outline-none px-3 text-base resize-none placeholder-gray-400"
-                    />
-                    <button className="text-gray-600 hover:text-black font-medium text-sm">Send</button>
+                <div className="flex flex-row items-end gap-3 px-4 py-3 rounded-2xl border border-gray-200 shadow-sm bg-white w-full">
+                    <div className="flex flex-col w-full">
+                        <p className="text-gray-600 font-medium text-sm">Chat</p>
+                        <textarea
+                            ref={textareaRef}
+                            placeholder="Use ⌘K for shortcuts"
+                            value={composerText}
+                            onChange={(e) => {
+                                setComposerText(e.target.value);
+                                // Resize immediately after value changes
+                                if (textareaRef.current) {
+                                    textareaRef.current.style.height = "auto";
+                                    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+                                }
+                            }}
+                            rows={1}
+                            className="w-full bg-transparent outline-none text-base overflow-hidden placeholder-gray-400 resize-none"
+                            style={{ minHeight: '40px', maxHeight: '200px' }}
+                        />
+                    </div>
+
+                    <button className="text-gray-600 hover:text-black font-medium text-sm px-3 border-r border-gray-300">Send</button>
+                    <button className="text-gray-600 hover:text-black font-medium text-sm">
+                        <FiChevronDown size={20} />
+                    </button>
                 </div>
             </div>
         </div>

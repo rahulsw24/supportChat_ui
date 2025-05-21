@@ -133,7 +133,7 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
                     <button className="text-gray-600 hover:text-black font-medium text-sm">Send</button>
                 </div> */}
                     <textarea
-                        rows={3}
+                        rows={1}
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
