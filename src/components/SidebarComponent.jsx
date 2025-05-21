@@ -39,13 +39,13 @@ function SidebarComponent({ customers, onSelectCustomer, selectedCustomer, isOpe
                                     )}
                                 </div>
 
-                                <div className="flex-1">
-                                    <div className="font-medium text-sm">{msg.name}</div>
-                                    <div className="text-xs text-gray-500 truncate">
-                                        {lastMessage?.text || 'No messages yet'}
+                                <div className="flex-1 flex flex-col">
+                                    <div className="flex justify-between items-center">
+                                        <div className="font-medium text-sm">{msg.name}</div>
+                                        <div className="text-xs text-gray-400 whitespace-nowrap ml-2">{timeAgo}</div>
                                     </div>
+                                    <div className="text-xs text-gray-500 truncate">{lastMessage?.text || 'No messages yet'}</div>
                                 </div>
-                                <div className="text-xs text-gray-400">{timeAgo}</div>
                             </li>
                         );
                     })}
