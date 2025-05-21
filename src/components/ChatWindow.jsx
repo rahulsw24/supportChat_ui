@@ -1,20 +1,54 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { getAvatarColor } from '../utils/getAvatarColor';
-import { FiSend } from "react-icons/fi";
-import { BiCopy } from "react-icons/bi";
 import { FiChevronDown } from "react-icons/fi";
-import { useEffect } from 'react';
 
 function ChatWindow({ customer, composerText, setComposerText }) {
-
+    const [selection, setSelection] = useState({ start: 0, end: 0, text: '' });
     const textareaRef = useRef(null);
 
+    // Handle selection
+    const handleSelection = () => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value.slice(start, end);
+
+        if (text) {
+            setSelection({ start, end, text });
+        } else {
+            setSelection({ start: 0, end: 0, text: '' });
+        }
+    };
+
+    // Auto resize
     useEffect(() => {
         if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto'; // Reset height
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set to scrollHeight
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
     }, [composerText]);
+
+    // Formatting functions
+    const applyFormatting = (wrapper) => {
+        const before = composerText.slice(0, selection.start);
+        const after = composerText.slice(selection.end);
+        const formatted = `${wrapper}${selection.text}${wrapper}`;
+        setComposerText(before + formatted + after);
+        setSelection({ start: 0, end: 0, text: '' });
+    };
+
+    const handleBold = () => applyFormatting('**');
+    const handleItalic = () => applyFormatting('*');
+
+    const handleCopilot = async () => {
+        // Mock AI paraphrasing
+        const paraphrased = `(${selection.text} - AI revised)`;
+        const before = composerText.slice(0, selection.start);
+        const after = composerText.slice(selection.end);
+        setComposerText(before + paraphrased + after);
+        setSelection({ start: 0, end: 0, text: '' });
+    };
 
     if (!customer) {
         return <div className="flex-1 bg-white p-6">No customer selected.</div>;
@@ -42,7 +76,6 @@ function ChatWindow({ customer, composerText, setComposerText }) {
                                 {customerInitial}
                             </div>
                         )}
-
                         <div className="max-w-xs">
                             <div className={`p-3 rounded-lg ${msg.from === 'agent' ? 'bg-[#e5e7fb] text-right' : 'bg-gray-100 text-left'}`}>
                                 {msg.text}
@@ -64,16 +97,26 @@ function ChatWindow({ customer, composerText, setComposerText }) {
 
             {/* Composer */}
             <div className="px-4 py-3 bg-white">
-                <div className="flex flex-row items-end gap-3 px-4 py-3 rounded-2xl border border-gray-200 shadow-sm bg-white w-full">
+                <div className="flex flex-row items-end gap-3 px-4 py-3 rounded-2xl border border-gray-200 shadow-sm bg-white w-full relative">
+                    {/* Floating toolbar */}
+                    {selection.text && (
+                        <div className="gabsolute bottom-[100px] left-4 flex gap-2 bg-white border shadow-md px-3 py-1 rounded-lg z-50">
+                            <button onClick={handleCopilot} className="text-purple-600 border-r border-gray-200 px-3">AI</button>
+                            <button onClick={handleBold} className="font-bold border-r border-gray-200 px-3">B</button>
+                            <button onClick={handleItalic} className="font-bold px-3">I</button>
+
+                        </div>
+                    )}
                     <div className="flex flex-col w-full">
                         <p className="text-gray-600 font-medium text-sm">Chat</p>
                         <textarea
                             ref={textareaRef}
                             placeholder="Use ⌘K for shortcuts"
+                            onMouseUp={handleSelection}
+                            onKeyUp={handleSelection}
                             value={composerText}
                             onChange={(e) => {
                                 setComposerText(e.target.value);
-                                // Resize immediately after value changes
                                 if (textareaRef.current) {
                                     textareaRef.current.style.height = "auto";
                                     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
@@ -85,7 +128,9 @@ function ChatWindow({ customer, composerText, setComposerText }) {
                         />
                     </div>
 
-                    <button className="text-gray-600 hover:text-black font-medium text-sm px-3 border-r border-gray-300">Send</button>
+                    <button className="text-gray-600 hover:text-black font-medium text-sm px-3 border-r border-gray-300">
+                        Send
+                    </button>
                     <button className="text-gray-600 hover:text-black font-medium text-sm">
                         <FiChevronDown size={20} />
                     </button>
