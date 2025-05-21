@@ -120,20 +120,33 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
             </div>
 
             {/* Input */}
-            <div className="border-t p-3 flex items-center space-x-2">
-                <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder={
-                        chatHistory.length > 0 ? "Ask a follow-up question..." : "Ask me anything..."
-                    }
-                    className="w-full border rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
-                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                />
-                <button onClick={handleSend}>
-                    <FiSend className="text-gray-500 hover:text-purple-600" size={20} />
-                </button>
+            <div className="px-4 py-3 border-gray-200">
+                <div className="flex flex-row items-center px-3 py-3 rounded-2xl border border-gray-200 shadow-sm bg-white w-full">
+                    {/* <div className="flex flex-row items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 shadow-sm bg-white w-full min-h-[64px]">
+                    <textarea
+                        placeholder="Use ⌘K for shortcuts"
+                        value={composerText}
+                        onChange={(e) => setComposerText(e.target.value)}
+                        rows={3}
+                        className="flex-1 bg-transparent outline-none px-3 text-base resize-none placeholder-gray-400"
+                    />
+                    <button className="text-gray-600 hover:text-black font-medium text-sm">Send</button>
+                </div> */}
+                    <textarea
+                        rows={3}
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder={
+                            chatHistory.length > 0 ? "Ask a follow-up question..." : "Ask me anything..."
+                        }
+                        className="flex-1 bg-transparent outline-none px-3 text-base resize-none placeholder-gray-400"
+                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    />
+                    <button onClick={handleSend}>
+                        <FiSend className="text-gray-500 hover:text-purple-600" size={20} />
+                    </button>
+                </div>
             </div>
         </div>
     );
