@@ -3,19 +3,19 @@ export const customers = [
     id: 1,
     name: "Luis - Github",
     lastMessage: "Hey! I have a question...",
-    timestamp: "2024-05-18T13:23:00Z",
+    timestamp: "2025-03-18T13:23:00Z",
     messages: [
       {
         from: "customer",
         text: "I bought a product from your store...",
         time: "1m",
-        timestamp: "2024-05-18T13:22:00Z",
+        timestamp: "2024-03-18T13:22:00Z",
       },
       {
         from: "agent",
         text: "Let me look into this...",
         time: "Just now",
-        timestamp: "2024-05-18T13:23:00Z",
+        timestamp: "2025-03-18T13:23:00Z",
       },
     ],
   },
