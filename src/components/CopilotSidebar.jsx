@@ -3,8 +3,8 @@ import axios from "axios";
 import { FiSend } from "react-icons/fi";
 import { BiCopy } from "react-icons/bi";
 
-const CopilotSidebar = ({ customer, setComposerText }) => {
-    const [chatHistory, setChatHistory] = useState([]); // { role: "user" | "ai", text: string }
+const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
+    const [chatHistory, setChatHistory] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const chatRef = useRef(null);
@@ -28,7 +28,6 @@ const CopilotSidebar = ({ customer, setComposerText }) => {
                     message: latestMsg.text,
                 });
                 const aiReply = res.data.reply;
-
                 setChatHistory([{ role: "ai", text: aiReply }]);
             } catch (err) {
                 setChatHistory([{ role: "ai", text: "Could not generate a reply." }]);
@@ -67,7 +66,15 @@ const CopilotSidebar = ({ customer, setComposerText }) => {
     };
 
     return (
-        <div className="flex flex-col h-full w-1/3 bg-gradient-to-b from-[#ffffff] via-[#fdf9fc] to-[#fef3f3]">
+        <div className="relative flex flex-col h-full w-full md:w-full lg:w-full bg-gradient-to-b from-[#ffffff] via-[#fdf9fc] to-[#fef3f3]">
+            {/* Close Button for Mobile */}
+            <button
+                onClick={onClose}
+                className="absolute top-3 right-3 md:hidden text-gray-500 hover:text-black text-lg z-50"
+            >
+                ✕
+            </button>
+
             {/* Tabs */}
             <div className="flex justify-between items-center p-3 border-gray-200 border-b">
                 <div className="flex space-x-4">
