@@ -86,7 +86,7 @@ function ChatWindow({ customer, composerText, setComposerText }) {
     return (
         <div className="flex flex-col w-full md:w-2/4 bg-white border-r border-gray-200 relative">
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b">
+            <div className="flex justify-between items-center px-6 p-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold">{customer.name}</h2>
                 <button className="text-sm px-3 py-1 bg-gray-100 rounded-md">Close</button>
             </div>

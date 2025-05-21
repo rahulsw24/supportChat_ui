@@ -76,9 +76,9 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
             </button>
 
             {/* Tabs */}
-            <div className="flex justify-between items-center p-3 border-gray-200 border-b">
+            <div className="flex justify-between items-center p-4 border-gray-200 border-b">
                 <div className="flex space-x-4">
-                    <button className="border-b-2 border-purple-500 text-purple-600 font-semibold pb-1">
+                    <button className="border-b-2 border-gray-500 text-base font-semibold">
                         AI Copilot
                     </button>
                     <button className="text-gray-500 hover:text-black">Details</button>
