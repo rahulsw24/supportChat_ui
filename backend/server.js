@@ -1,7 +1,10 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-const { default: getTogetherAiResponse } = require("./utils/togetherClient");
+const {
+  getTogetherAiResponse,
+  getTogetherCustomerResponse,
+} = require("./utils/togetherClient");
 require("dotenv").config();
 
 const app = express();
@@ -21,6 +24,29 @@ app.post("/api/generate-reply", async (req, res) => {
   } catch (err) {
     console.error("Together.AI Error", err.message);
     return res.status(500).json({ error: "Failed to get AI response" });
+  }
+});
+
+app.post("/api/generate-customer", async (req, res) => {
+  const { chatHistory, persona } = req.body;
+  if (!chatHistory || !Array.isArray(chatHistory)) {
+    return res.status(400).json({ error: "chatHistory must be an array" });
+  }
+
+  const historyText = chatHistory
+    .map(
+      (msg) => `${msg.sender === "agent" ? "Agent" : "Customer"}: ${msg.text}`
+    )
+    .join("\n");
+
+  try {
+    const reply = await getTogetherCustomerResponse(chatHistory, persona);
+    return res.status(200).json({ reply });
+  } catch (err) {
+    console.error("Together.AI Error (customer)", err.message);
+    return res
+      .status(500)
+      .json({ error: "Failed to generate customer message" });
   }
 });
 

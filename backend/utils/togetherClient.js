@@ -64,4 +64,82 @@ NovaTech offers high-quality electronics such as smartphones, laptops, audio dev
   }
 };
 
-export default getTogetherAiResponse;
+// const getTogetherCustomerResponse = async (chatHistory, persona) => {
+//   const historyText = chatHistory
+//     .map(
+//       (msg) => `${msg.sender === "agent" ? "Agent" : "Customer"}: ${msg.text}`
+//     )
+//     .join("\n");
+
+//   const prompt = `You are a ${
+//     persona || "typical customer"
+//   } talking to a support agent. Continue the conversation naturally:\n\n${historyText}\nCustomer:`;
+
+//   return getTogetherAiResponse(prompt);
+// };
+
+const getTogetherCustomerResponse = async (
+  chatHistory,
+  persona,
+  retryCount = 0
+) => {
+  try {
+    const messages = [
+      {
+        role: "system",
+        content: `
+You are simulating a realistic customer in a support chat for a fictional electronics brand called NovaTech.
+
+**Persona Instructions:**
+${
+  persona ||
+  "You are a curious and mildly frustrated customer seeking quick help for your issue."
+}
+
+**Your tone should be:**
+- Natural and human-like
+- Varies based on persona (e.g., confused, polite, impatient)
+- Casual, but not robotic or overly formal
+
+**Instructions:**
+- Respond as if you're the customer in the chat below.
+- Do not answer like an assistant or mention you are an AI.
+- Keep replies brief (1-3 sentences), as in real chat.
+- Only generate the next message *from the customer*.
+
+**Chat so far:**`,
+      },
+      ...chatHistory.map((msg) => ({
+        role: msg.from === "agent" ? "assistant" : "user",
+        content: msg.text,
+      })),
+      {
+        role: "user",
+        content: "Customer:",
+      },
+    ];
+
+    const response = await together.chat.completions.create({
+      model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+      messages,
+    });
+
+    const rawReply = response.choices[0].message.content;
+    const cleanedReply = rawReply
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .trim();
+
+    return cleanedReply;
+  } catch (error) {
+    if (error.status === 429 && retryCount < 3) {
+      console.warn(`Rate limit hit. Retrying... (${retryCount + 1})`);
+      await delay(1100);
+      return getTogetherCustomerResponse(chatHistory, persona, retryCount + 1);
+    }
+
+    console.error("Error fetching customer response from Together.AI:", error);
+    throw new Error("Failed to get customer reply");
+  }
+};
+
+export { getTogetherAiResponse, getTogetherCustomerResponse };
