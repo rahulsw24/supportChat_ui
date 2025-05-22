@@ -84,12 +84,6 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
     return (
         <div className="relative flex flex-col h-full w-full md:w-full lg:w-full bg-gradient-to-b from-[#ffffff] via-[#fdf9fc] to-[#fef3f3]">
             {/* Close Button for Mobile */}
-            <button
-                onClick={onClose}
-                className="absolute top-3 right-3 md:hidden text-gray-500 hover:text-black text-lg z-50"
-            >
-                ✕
-            </button>
 
             {/* Tabs */}
             <div className="flex justify-between items-center p-4 border-gray-200 border-b">
@@ -99,7 +93,7 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
                     </button>
                     <button className="text-gray-500 hover:text-black">Details</button>
                 </div>
-                <BiCopy className="text-gray-400 hover:text-black cursor-pointer" size={20} />
+                <BiCopy className="hidden md:inline text-gray-400 hover:text-black cursor-pointer" size={20} />
             </div>
 
             {/* Chat Section */}
