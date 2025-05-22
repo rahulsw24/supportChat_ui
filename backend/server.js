@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Hello from the server!");
+  console.log(process.env.TOGETHER_API_KEY);
 });
 
 app.post("/api/generate-reply", async (req, res) => {

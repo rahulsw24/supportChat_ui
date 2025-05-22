@@ -1,18 +1,24 @@
 import Together from "together-ai";
+import dotenv from "dotenv";
+dotenv.config();
 
 const together = new Together({
-  apiKey: "tgp_v1_CWcDAPxieC5oTxBhy2sMt5NQylisPXCsekcP_zrLIQo",
+  apiKey: `${process.env.TOGETHER_API_KEY}`, // Ideally move this to env
 });
 
-const getTogetherAiResponse = async (message) => {
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getTogetherAiResponse = async (message, retryCount = 0) => {
   try {
     const response = await together.chat.completions.create({
-      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+      model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
       messages: [
         {
           role: "system",
           content: `
 You are a helpful, empathetic, and professional customer support agent for a fictional consumer electronics brand called NovaTech.
+
+Respond directly to the user. Do not include internal thoughts, <think> tags, or reasoning steps in your response.
 
 **Your tone should always be:**
 - Friendly and professional
@@ -33,14 +39,26 @@ NovaTech offers high-quality electronics such as smartphones, laptops, audio dev
 - Avoid over-explaining. Share only what the customer needs unless they ask for more.
 - If unsure about a case, suggest the customer contact support via email or open a support ticket.
 - Do not provide real-time tracking or personal data unless it's already provided by the customer.
-  `,
+          `,
         },
         { role: "user", content: message },
       ],
     });
 
-    return response.choices[0].message.content;
+    // Clean up any <think> tags
+    const rawReply = response.choices[0].message.content;
+    const cleanedReply = rawReply
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .trim();
+
+    return cleanedReply;
   } catch (error) {
+    if (error.status === 429 && retryCount < 3) {
+      console.warn(`Rate limit hit. Retrying... (${retryCount + 1})`);
+      await delay(1100); // wait 1.1s before retry
+      return getTogetherAiResponse(message, retryCount + 1);
+    }
+
     console.error("Error fetching response from Together.AI:", error);
     throw new Error("Failed to get AI response");
   }
