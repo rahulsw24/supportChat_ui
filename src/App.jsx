@@ -23,7 +23,10 @@ function App() {
 
       <SidebarComponent
         customers={customers}
-        onSelectCustomer={setSelectedCustomer}
+        onSelectCustomer={(customer) => {
+          setSelectedCustomer(customer);
+          setSidebarOpen(false);
+        }}
         selectedCustomer={selectedCustomer}
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}

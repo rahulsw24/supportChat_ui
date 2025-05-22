@@ -128,7 +128,7 @@ function ChatWindow({ customer, composerText, setComposerText }) {
                                     🤖
                                 </button>
                                 {showCopilotOptions && (
-                                    <div className="absolute top-full left-0 mt-2 bg-white border rounded-md shadow-lg z-50">
+                                    <div className="absolute bottom-full left-0 mt-2 bg-white border rounded-md shadow-lg z-50">
                                         <button onClick={() => handleCopilotOption('paraphrase')} className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">Paraphrase</button>
                                         <button onClick={() => handleCopilotOption('tone')} className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">Change Tone</button>
                                         <button onClick={() => handleCopilotOption('polite')} className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">Make Polite</button>

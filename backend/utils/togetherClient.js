@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const together = new Together({
-  apiKey: `${process.env.TOGETHER_API_KEY}`, // Ideally move this to env
-});
+  apiKey: "tgp_v1_CtNOEzLOT73j3TwzDyvu3TL5z6s5y2p1vJF3Gsi4xds",
+}); // Ideally move this to env
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
