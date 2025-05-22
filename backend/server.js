@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 console.log("PORT from env:", process.env.PORT);
 app.get("/", (req, res) => {
-  console.log(process.env.TOGETHER_API_KEY);
+  res.send("Hello from the server!");
 });
 
 app.post("/api/generate-reply", async (req, res) => {
