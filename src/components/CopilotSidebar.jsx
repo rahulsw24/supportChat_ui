@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { FiSend } from "react-icons/fi";
 import { BiCopy } from "react-icons/bi";
-import dotenv from "dotenv";
-dotenv.config();
+
+
 
 const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
     const [chatHistory, setChatHistory] = useState([]);
@@ -11,6 +11,7 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
     const [loading, setLoading] = useState(false);
     const chatRef = useRef(null);
     const [showIntro, setShowIntro] = useState(false);
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
     useEffect(() => {
@@ -36,7 +37,7 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
         const fetchInitialReply = async () => {
             setLoading(true);
             try {
-                const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/generate-reply`, {
+                const res = await axios.post(`${API_BASE_URL}/api/generate-reply`, {
                     message: latestMsg.text,
                 });
                 const aiReply = res.data.reply;
@@ -63,7 +64,7 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
         setLoading(true);
 
         try {
-            const res = await axios.post("http://localhost:3000/api/generate-reply", {
+            const res = await axios.post(`${API_BASE_URL}/api/generate-reply`, {
                 message: input,
             });
 
