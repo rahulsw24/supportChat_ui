@@ -37,7 +37,7 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
         const fetchInitialReply = async () => {
             setLoading(true);
             try {
-                const res = await axios.post(`${API_BASE_URL}/api/generate-customer`, {
+                const res = await axios.post(`${API_BASE_URL}/api/generate-reply`, {
                     message: latestMsg.text,
                 });
                 const aiReply = res.data.reply;
