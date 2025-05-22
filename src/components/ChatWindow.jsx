@@ -8,6 +8,7 @@ function ChatWindow({ customer, composerText, setComposerText, setCustomer }) {
     const [showCopilotOptions, setShowCopilotOptions] = useState(false);
     const textareaRef = useRef(null);
     const lastHandledCustomerTextRef = useRef(null);
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     const handleSelection = () => {
         const textarea = textareaRef.current;
@@ -48,7 +49,7 @@ function ChatWindow({ customer, composerText, setComposerText, setCustomer }) {
         const after = composerText.slice(selection.end);
 
         try {
-            const response = await axios.post('http://localhost:3000/api/generate-reply', {
+            const response = await axios.post(`${API_BASE_URL}/api/generate-reply`, {
                 message: prompt
             });
 
@@ -78,7 +79,7 @@ function ChatWindow({ customer, composerText, setComposerText, setCustomer }) {
 
         try {
             // Step 2: Send only the latest agent message to the backend
-            const res = await axios.post("http://localhost:3000/api/generate-customer", {
+            const res = await axios.post(`${API_BASE_URL}/api/generate-customer`, {
                 latestAgentMessage: agentMessage.text,
                 persona: customer.persona || "You are a helpful customer."
             });
