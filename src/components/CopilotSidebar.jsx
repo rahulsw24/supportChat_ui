@@ -23,77 +23,51 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
     const isFetchingRef = useRef(false);
 
     useEffect(() => {
-        if (!customer || !customer.messages.length || isFetchingRef.current) return;
+        if (!customer || !customer.messages.length) return;
 
-        const latestMsg = [...customer.messages].reverse().find(msg => msg.from !== "agent");
+        const latestMsg = [...customer.messages].reverse().find(msg => msg.from === "customer");
         if (!latestMsg || lastHandledCustomerTextRef.current === latestMsg.text) return;
 
-        isFetchingRef.current = true;
-        setShowIntro(true);
-        setChatHistory([
-            { role: "intro", text: "👋 Hi, I’m Fin’s Copilot! Give me a moment while I read the conversation…" }
-        ]);
+        lastHandledCustomerTextRef.current = latestMsg.text;
+        setLoading(true);
 
-        const fetchInitialReply = async () => {
-            setLoading(true);
+        const isInitial = chatHistory.length === 0;
+
+        // Add intro + generating only once (initial load)
+        if (isInitial) {
+            setChatHistory([
+                { role: "intro", text: "👋 Hi, I’m Fin’s Copilot! Give me a moment while I read the conversation…" },
+                { role: "generating", text: "🤖 Generating response..." },
+            ]);
+        } else {
+            setChatHistory(prev => [...prev, { role: "generating", text: "🤖 Generating response..." }]);
+        }
+
+        const fetchReply = async () => {
             try {
                 const res = await axios.post(`${API_BASE_URL}/api/generate-reply`, {
                     message: latestMsg.text,
                 });
+
                 const aiReply = res.data.reply;
-                setChatHistory([{ role: "ai", text: aiReply }]);
-                lastHandledCustomerTextRef.current = latestMsg.text;
+
+                setChatHistory(prev => [
+                    ...prev.filter(msg => msg.role !== "generating" && msg.role !== "intro"),
+                    { role: "ai", text: aiReply }
+                ]);
             } catch (err) {
-                setChatHistory([{ role: "ai", text: "Could not generate a reply." }]);
+                setChatHistory(prev => [
+                    ...prev.filter(msg => msg.role !== "generating" && msg.role !== "intro"),
+                    { role: "ai", text: "Could not generate a reply." }
+                ]);
             } finally {
                 setLoading(false);
                 setShowIntro(false);
-                isFetchingRef.current = false;
             }
         };
 
-        setTimeout(fetchInitialReply, 800);
-    }, [customer]);
-
-
-    useEffect(() => {
-        if (!customer || !customer.messages.length) return;
-
-        const lastCustomerMessage = [...customer.messages].reverse().find(msg => msg.from === "customer");
-        if (!lastCustomerMessage || lastHandledCustomerTextRef.current === lastCustomerMessage.text) return;
-
-        const handleCustomerMessage = async () => {
-            setLoading(true);
-            setChatHistory(prev => [...prev, { role: "generating", text: "🤖 Generating response..." }]);
-
-            try {
-                const res = await axios.post(`${API_BASE_URL}/api/generate-reply`, {
-                    message: lastCustomerMessage.text,
-                });
-
-                const aiReply = res.data.reply;
-                setChatHistory(prev =>
-                    [
-                        ...prev.filter(msg => msg.role !== "generating"),
-                        { role: "ai", text: aiReply }
-                    ]
-                );
-                lastHandledCustomerTextRef.current = lastCustomerMessage.text;
-            } catch (err) {
-                setChatHistory(prev =>
-                    [
-                        ...prev.filter(msg => msg.role !== "generating"),
-                        { role: "ai", text: "Couldn't generate reply." }
-                    ]
-                );
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        handleCustomerMessage();
-    }, [customer.messages]);
-
+        setTimeout(fetchReply, 800);
+    }, [customer?.messages]);
 
     const handleSend = async () => {
         if (!input.trim() || loading) return;

@@ -7,7 +7,7 @@ function ChatWindow({ customer, composerText, setComposerText, setCustomer }) {
     const [selection, setSelection] = useState({ start: 0, end: 0, text: '' });
     const [showCopilotOptions, setShowCopilotOptions] = useState(false);
     const textareaRef = useRef(null);
-
+    const lastHandledCustomerTextRef = useRef(null);
 
     const handleSelection = () => {
         const textarea = textareaRef.current;
@@ -77,9 +77,9 @@ function ChatWindow({ customer, composerText, setComposerText, setCustomer }) {
         setComposerText("");
 
         try {
-            // Step 2: Call backend to generate AI customer reply
+            // Step 2: Send only the latest agent message to the backend
             const res = await axios.post("http://localhost:3000/api/generate-customer", {
-                chatHistory: updatedCustomer.messages,
+                latestAgentMessage: agentMessage.text,
                 persona: customer.persona || "You are a helpful customer."
             });
 
@@ -173,6 +173,12 @@ function ChatWindow({ customer, composerText, setComposerText, setCustomer }) {
                             placeholder="Use ⌘K for shortcuts"
                             onMouseUp={handleSelection}
                             onKeyUp={handleSelection}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault(); // Prevent newline
+                                    handleSend();
+                                }
+                            }}
                             value={composerText}
                             onChange={(e) => {
                                 setComposerText(e.target.value);

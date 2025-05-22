@@ -78,68 +78,45 @@ NovaTech offers high-quality electronics such as smartphones, laptops, audio dev
 //   return getTogetherAiResponse(prompt);
 // };
 
-const getTogetherCustomerResponse = async (
-  chatHistory,
-  persona,
-  retryCount = 0
-) => {
-  try {
-    const messages = [
-      {
-        role: "system",
-        content: `
+const getTogetherCustomerResponse = async (latestAgentMessage, persona) => {
+  const messages = [
+    {
+      role: "system",
+      content: `
 You are simulating a realistic customer in a support chat for a fictional electronics brand called NovaTech.
 
-**Persona Instructions:**
-${
-  persona ||
-  "You are a curious and mildly frustrated customer seeking quick help for your issue."
-}
-
-**Your tone should be:**
-- Natural and human-like
-- Varies based on persona (e.g., confused, polite, impatient)
-- Casual, but not robotic or overly formal
+**Persona:** 
+${persona || "A mildly frustrated but polite customer looking for help."}
 
 **Instructions:**
-- Respond as if you're the customer in the chat below.
-- Do not answer like an assistant or mention you are an AI.
-- Keep replies brief (1-3 sentences), as in real chat.
-- Only generate the next message *from the customer*.
+- Only respond as the customer.
+- Do NOT include thoughts, planning, or reasoning.
+- Do NOT say what you're about to do or why.
+- Do NOT explain your reasoning.
+- DO NOT output anything except the final customer reply.
+- Keep it short and natural (1–3 sentences).
+- Never mention being an AI or assistant.
+- Do not repeat what the agent said.
+`,
+    },
+    {
+      role: "user",
+      content: latestAgentMessage,
+    },
+  ];
 
-**Chat so far:**`,
-      },
-      ...chatHistory.map((msg) => ({
-        role: msg.from === "agent" ? "assistant" : "user",
-        content: msg.text,
-      })),
-      {
-        role: "user",
-        content: "Customer:",
-      },
-    ];
+  const response = await together.chat.completions.create({
+    model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+    messages,
+  });
 
-    const response = await together.chat.completions.create({
-      model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
-      messages,
-    });
+  const rawReply = response.choices[0].message.content;
 
-    const rawReply = response.choices[0].message.content;
-    const cleanedReply = rawReply
-      .replace(/<think>[\s\S]*?<\/think>/gi, "")
-      .trim();
+  // This will help if any internal thoughts still slip in
+  const cleanedReply = rawReply
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    .trim();
 
-    return cleanedReply;
-  } catch (error) {
-    if (error.status === 429 && retryCount < 3) {
-      console.warn(`Rate limit hit. Retrying... (${retryCount + 1})`);
-      await delay(1100);
-      return getTogetherCustomerResponse(chatHistory, persona, retryCount + 1);
-    }
-
-    console.error("Error fetching customer response from Together.AI:", error);
-    throw new Error("Failed to get customer reply");
-  }
+  return cleanedReply;
 };
-
 export { getTogetherAiResponse, getTogetherCustomerResponse };
