@@ -3,10 +3,11 @@ import { getAvatarColor } from '../utils/getAvatarColor';
 import { FiChevronDown } from "react-icons/fi";
 import axios from 'axios';
 
-function ChatWindow({ customer, composerText, setComposerText }) {
+function ChatWindow({ customer, composerText, setComposerText, setCustomer }) {
     const [selection, setSelection] = useState({ start: 0, end: 0, text: '' });
     const [showCopilotOptions, setShowCopilotOptions] = useState(false);
     const textareaRef = useRef(null);
+
 
     const handleSelection = () => {
         const textarea = textareaRef.current;
@@ -62,14 +63,38 @@ function ChatWindow({ customer, composerText, setComposerText }) {
         setShowCopilotOptions(false);
     };
 
-    const mockTogetherAiCall = async (prompt) => {
-        // Simulate AI delay and response
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(`[AI: ${prompt}]`);
-            }, 600);
-        });
+    const handleSend = async () => {
+        if (!composerText.trim()) return;
+
+        const agentMessage = { from: "agent", text: composerText.trim() };
+
+        // Step 1: Update UI with agent's message
+        const updatedCustomer = {
+            ...customer,
+            messages: [...customer.messages, agentMessage],
+        };
+        setCustomer(updatedCustomer);
+        setComposerText("");
+
+        try {
+            // Step 2: Call backend to generate AI customer reply
+            const res = await axios.post("http://localhost:3000/api/generate-customer", {
+                chatHistory: updatedCustomer.messages,
+                persona: customer.persona || "You are a helpful customer."
+            });
+
+            // Step 3: Update UI with AI reply
+            const aiMessage = { from: "customer", text: res.data.reply };
+            setCustomer({
+                ...updatedCustomer,
+                messages: [...updatedCustomer.messages, aiMessage]
+            });
+        } catch (err) {
+            console.error("Failed to generate AI customer reply:", err.message);
+            alert("Error generating AI customer reply.");
+        }
     };
+
 
     useEffect(() => {
         if (textareaRef.current) {
@@ -162,7 +187,14 @@ function ChatWindow({ customer, composerText, setComposerText }) {
                         />
                     </div>
 
-                    <button className="text-gray-600 hover:text-black font-medium text-sm px-3 border-r border-gray-300">
+                    <button
+                        onClick={handleSend}
+                        disabled={!composerText.trim()}
+                        className={`text-sm px-3 border-r border-gray-300 font-medium ${composerText.trim()
+                            ? "text-gray-600 hover:text-black"
+                            : "text-gray-400 cursor-not-allowed"
+                            }`}
+                    >
                         Send
                     </button>
                     <button className="text-gray-600 hover:text-black font-medium text-sm">

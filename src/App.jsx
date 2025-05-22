@@ -45,6 +45,7 @@ function App() {
         customer={selectedCustomer}
         composerText={composerText}
         setComposerText={setComposerText}
+        setCustomer={setSelectedCustomer}
       />
 
       {/* Copilot Sidebar */}
