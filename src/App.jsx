@@ -3,6 +3,7 @@ import SidebarComponent from './components/SidebarComponent';
 import ChatWindow from './components/ChatWindow';
 import CopilotSidebar from './components/CopilotSidebar';
 import { customers } from './data/customers'; //
+import { FiInbox } from "react-icons/fi";
 
 function App() {
   const [selectedCustomer, setSelectedCustomer] = useState(customers[0]); // Default to first
@@ -12,29 +13,36 @@ function App() {
 
   return (
     <div className='flex h-screen bg-[#ede9fe]'>
+
       <button
         onClick={() => setSidebarOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-indigo-600 text-white px-3 py-2 rounded-md"
+        className="md:hidden fixed top-1/2 left-0 transform -translate-y-1/2 z-30 bg-white border border-indigo-300 text-indigo-600 hover:bg-indigo-100 px-2 py-1 rounded-r-md shadow-md"
       >
-        ☰ Inbox
+        ▷
       </button>
+
       <SidebarComponent
         customers={customers}
         onSelectCustomer={setSelectedCustomer}
         selectedCustomer={selectedCustomer}
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
+
       />
+
+
+
       <ChatWindow customer={selectedCustomer} composerText={composerText}
         setComposerText={setComposerText} />
       {/* Toggle Button for Mobile */}
-      <button
-        className="md:hidden fixed top-4 right-4 z-50 bg-purple-600 text-white px-3 py-1 rounded-md shadow-lg"
-        onClick={() => setShowCopilot(!showCopilot)}
-      >
-        {showCopilot ? "Hide Copilot" : "Show Copilot"}
-      </button>
-
+      {!isSidebarOpen && (
+        <button
+          className="md:hidden absolute top-4 right-4 z-50 bg-purple-600 text-white px-3 py-1 rounded-md shadow-lg"
+          onClick={() => setShowCopilot(!showCopilot)}
+        >
+          {showCopilot ? "Hide Copilot" : "Show Copilot"}
+        </button>
+      )}
       {/* Copilot Sidebar */}
       <div
         className={`

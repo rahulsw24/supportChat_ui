@@ -17,14 +17,19 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
         }
     }, [chatHistory, loading]);
 
+    const isFetchingRef = useRef(false);
+
     useEffect(() => {
-        if (!customer || !customer.messages.length) return;
+        if (!customer || !customer.messages.length || isFetchingRef.current) return;
 
         const latestMsg = [...customer.messages].reverse().find(msg => msg.from !== "agent");
         if (!latestMsg) return;
 
-        setShowIntro(true); // show intro screen
-        setChatHistory([{ role: "intro", text: "👋 Hi, I’m Fin’s Copilot! Give me a moment while I read the conversation…" }]);
+        isFetchingRef.current = true;
+        setShowIntro(true);
+        setChatHistory([
+            { role: "intro", text: "👋 Hi, I’m Fin’s Copilot! Give me a moment while I read the conversation…" }
+        ]);
 
         const fetchInitialReply = async () => {
             setLoading(true);
@@ -39,15 +44,16 @@ const CopilotSidebar = ({ customer, setComposerText, onClose }) => {
             } finally {
                 setLoading(false);
                 setShowIntro(false);
+                isFetchingRef.current = false;
             }
         };
 
-        // Optional delay for better UX
+        // Delay for better UX and spacing requests
         setTimeout(fetchInitialReply, 800);
     }, [customer]);
 
     const handleSend = async () => {
-        if (!input.trim()) return;
+        if (!input.trim() || loading) return;
 
         const newHistory = [...chatHistory, { role: "user", text: input }];
         setChatHistory(newHistory);
