@@ -1,6 +1,7 @@
 # 🛠️ Support Chat UI
 
 > 🔗 **Live Demo:** [https://support-chat-ui-theta.vercel.app](https://support-chat-ui-theta.vercel.app)
+> 
 > ⚠️ **Note:** AI responses may take a few seconds to generate, as the backend uses a free-tier DeepSeek model via Together.ai.
 
 ---
