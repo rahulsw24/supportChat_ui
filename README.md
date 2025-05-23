@@ -71,7 +71,7 @@ This project replicates key features that help support agents handle customer qu
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/support-chat-ui.git
+git clone https://github.com/rahulsw24/supportChat_ui
 cd support-chat-ui
 
 # Install dependencies
