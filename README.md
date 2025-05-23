@@ -65,23 +65,6 @@ This project replicates key features that help support agents handle customer qu
 | Backend        | Node.js/Express (Deployed on Render) |
 | AI Integration | Together.ai (using DeepSeek model)   |
 
----
-
-## 🚀 Getting Started (Local Setup)
-
-```bash
-# Clone the repository
-git clone https://github.com/rahulsw24/supportChat_ui
-cd support-chat-ui
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
-
-Ensure you set up environment variables for API keys and backend endpoints as needed.
 
 ---
 
