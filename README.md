@@ -8,7 +8,7 @@
 ## 🎥 Video Demonstration
 
 Here is the link to the video demo of the project:
-*(Coming Soon – will be added once available)*
+https://drive.google.com/file/d/17yOrkXWfbmxIkxSFIHIiPhuXpmABeB4R/view?usp=sharing
 
 ---
 
